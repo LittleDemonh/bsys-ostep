@@ -1,7 +1,4 @@
-//
-// Created by janis on 04.10.24.
-//
-#define _GNU_SOURCE
+#define _GNU_SOURCE             // for execvpe
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,34 +8,46 @@
 #include <features.h>
 
 int main() {
-    char *argv[] = {"ls", "-l", "-a", "-h", (char *)NULL};
-    char *envp[] = {"PATH=/bin:/usr/bin", NULL};
+    char *argv[] = {"ls", (char *)NULL};
+    char *envp[] = {"PATH=/bin", NULL};
 
     int rc = fork();
     if(rc < 0) {
         fprintf(stderr, "fork failed\n");
         exit(1);
     } else if(rc == 0) {
-        if (execlp("ls", "ls", "-l", "-a", "-h", (char *)NULL) == -1) {
+        if (execlp("ls", "ls", (char *)NULL) == -1) {
             fprintf(stderr, "execlp failed\n");
             exit(1);
         }
     }
 
-    waitpid(rc, NULL, 0);
+    wait(NULL);
+
+    if(rc < 0) {
+    fprintf(stderr, "fork failed\n");
+    exit(1);
+    } else if(rc == 0) {
+        if (execl("/bin/ls", "ls", (char *)NULL) == -1) {   
+            fprintf(stderr, "execl failed\n");
+            exit(1);
+        }
+    }
+
+    wait(NULL); 
 
     rc = fork();
     if(rc < 0) {
         fprintf(stderr, "fork failed\n");
         exit(1);
     } else if(rc == 0) {
-        if (execle("/bin/ls", "ls", "-l", "-a", "-h", (char *)NULL, envp) == -1) {
+        if (execle("/bin/ls", "ls", (char *)NULL, envp) == -1) {
             fprintf(stderr, "execle failed\n");
             exit(1);
         }
     }
 
-    waitpid(rc, NULL, 0);
+    wait(NULL);
 
     rc = fork();
     if(rc < 0) {
@@ -50,7 +59,8 @@ int main() {
             exit(1);
         }
     }
-    waitpid(rc, NULL, 0);
+
+    wait(NULL);
 
     rc = fork();
     if(rc < 0) {
@@ -62,7 +72,8 @@ int main() {
             exit(1);
         }
     }
-    waitpid(rc, NULL, 0);
+
+    wait(NULL);
 
     rc = fork();
     if(rc < 0) {
@@ -74,6 +85,6 @@ int main() {
             exit(1);
         }
     }
-    waitpid(rc, NULL, 0);
+
     return 0;
 }
