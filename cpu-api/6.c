@@ -16,8 +16,8 @@ int main()
         printf("hello\n");
     }
     else
-    { // parent goes down this path (main)
-        int w = waitpid(rc, NULL, 0);       // 0 warten auf Childprozess bis er beendet ist
+    {                                 // parent goes down this path (main)
+        int w = waitpid(rc, NULL, 0); // rc auf welches Childprozess gewartet wird
         printf("goodbye\n");
         printf("waitpid(): %d\n", w);
     }

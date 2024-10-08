@@ -1,4 +1,4 @@
-#define _GNU_SOURCE             // for execvpe
+#define _GNU_SOURCE // for execvpe
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,16 +7,22 @@
 #include <fcntl.h>
 #include <features.h>
 
-int main() {
+int main()
+{
     char *argv[] = {"ls", (char *)NULL};
     char *envp[] = {"PATH=/bin", NULL};
 
     int rc = fork();
-    if(rc < 0) {
+    if (rc < 0)
+    {
         fprintf(stderr, "fork failed\n");
         exit(1);
-    } else if(rc == 0) {
-        if (execlp("ls", "ls", (char *)NULL) == -1) {
+    }
+    else if (rc == 0)
+    {
+        // sucht im path, erfordert nicht den vollständigen Pfad, Programmname reicht
+        if (execlp("ls", "ls", (char *)NULL) == -1) 
+        {
             fprintf(stderr, "execlp failed\n");
             exit(1);
         }
@@ -24,24 +30,35 @@ int main() {
 
     wait(NULL);
 
-    if(rc < 0) {
-    fprintf(stderr, "fork failed\n");
-    exit(1);
-    } else if(rc == 0) {
-        if (execl("/bin/ls", "ls", (char *)NULL) == -1) {   
+    rc = fork();
+    if (rc < 0)
+    {
+        fprintf(stderr, "fork failed\n");
+        exit(1);
+    }
+    else if (rc == 0)
+    {
+        // sucht nicht im path
+        if (execl("/bin/ls", "ls", (char *)NULL) == -1) 
+        {
             fprintf(stderr, "execl failed\n");
             exit(1);
         }
     }
 
-    wait(NULL); 
+    wait(NULL);
 
     rc = fork();
-    if(rc < 0) {
+    if (rc < 0)
+    {
         fprintf(stderr, "fork failed\n");
         exit(1);
-    } else if(rc == 0) {
-        if (execle("/bin/ls", "ls", (char *)NULL, envp) == -1) {
+    }
+    else if (rc == 0)
+    {
+        // sucht nicht im path, man kann Umgebungsvariablen setzen
+        if (execle("/bin/ls", "ls", (char *)NULL, envp) == -1)  
+        {
             fprintf(stderr, "execle failed\n");
             exit(1);
         }
@@ -50,11 +67,16 @@ int main() {
     wait(NULL);
 
     rc = fork();
-    if(rc < 0) {
+    if (rc < 0)
+    {
         fprintf(stderr, "fork failed\n");
         exit(1);
-    } else if(rc == 0) {
-        if (execvp("ls", argv) == -1) {
+    }
+    else if (rc == 0)
+    {
+        // sucht im path, programmname reicht
+        if (execvp("ls", argv) == -1)
+        {
             fprintf(stderr, "execvp failed\n");
             exit(1);
         }
@@ -63,11 +85,16 @@ int main() {
     wait(NULL);
 
     rc = fork();
-    if(rc < 0) {
+    if (rc < 0)
+    {
         fprintf(stderr, "fork failed\n");
         exit(1);
-    } else if(rc == 0) {
-        if (execve("/bin/ls", argv, envp) == -1) {
+    }
+    else if (rc == 0)
+    {
+        // sucht nicht im path, pfad muss angegeben werden, Umgebungsvariablen können gesetzt werden
+        if (execve("/bin/ls", argv, envp) == -1)
+        {
             fprintf(stderr, "execve failed\n");
             exit(1);
         }
@@ -76,11 +103,16 @@ int main() {
     wait(NULL);
 
     rc = fork();
-    if(rc < 0) {
+    if (rc < 0)
+    {
         fprintf(stderr, "fork failed\n");
         exit(1);
-    } else if(rc == 0) {
-        if (execvpe("ls", argv, envp) == -1) {
+    }
+    else if (rc == 0)
+    {
+        // sucht im path, programmname reicht, Umgebungsvariablen können gesetzt werden
+        if (execvpe("ls", argv, envp) == -1)
+        {
             fprintf(stderr, "execvpe failed\n");
             exit(1);
         }
@@ -88,3 +120,6 @@ int main() {
 
     return 0;
 }
+// jedes exec braucht andere argumente
+// manche suchen im path, andere brauchen den vollständigen pfad
+// manche können Umgebungsvariablen setzen

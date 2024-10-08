@@ -5,8 +5,8 @@
 
 int main()
 {
-    int fd = open("file.txt", O_WRONLY | O_CREAT | O_TRUNC);    // filedescriptor wie ID für Datei, O_WRONLY: Schreibrechte, O_CREAT: Datei wird erstellt, O_TRUNC: Datei wird geleert
-    if (fd < 0) // Falls Datei nicht erstellt werden kann
+    int fd = open("2.txt", O_WRONLY | O_CREAT | O_TRUNC);
+    if (fd < 0)
     {
         fprintf(stderr, "open file failed\n");
         exit(1);
@@ -31,3 +31,5 @@ int main()
     close(fd);
     return 0;
 }
+// beide Prozesse schreiben in die Datei, da sie den gleichen filedescriptor verwenden
+// es könnte zu verschachtelten Ausgaben kommen, da beide Prozesse gleichzeitig schreiben können

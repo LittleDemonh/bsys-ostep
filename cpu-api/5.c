@@ -14,15 +14,15 @@ int main()
     else if (rc == 0)
     { // child (new process)
         int w = wait(NULL);
-        printf("hello\n");          
-        printf("wait(): %d\n", w);     //wenn wait() im Childprozess aufgerufen wird, gibt es -1 zurück, da es keine weiteren Childprozesse gibt
+        printf("hello\n");
+        printf("wait(): %d\n", w); // wenn wait() im Childprozess aufgerufen wird, gibt es -1 zurück, da es keine weiteren Childprozesse gibt
     }
     else
     { // parent goes down this path (main)
         int w = wait(NULL);
         printf("goodbye\n");
-        printf("wait(): %d\n", w);  //wait() gibt die PID des Childprozesses zurück
-                                    //Parent wartet auf Childprozess
+        printf("wait(): %d\n", w); // wait() gibt die PID des Childprozesses zurück
+                                   // Parent wartet auf Childprozess
     }
     return 0;
 }

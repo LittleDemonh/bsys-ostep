@@ -1,56 +1,70 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
+#include <fcntl.h>
 #include <sys/wait.h>
 
-int main() 
+int main()
 {
-    int pipefd[2];
-    if (pipe(pipefd) == -1) 
+
+    int fds[2]; // fds[0] = read, fds[1] = write
+    char buffer[50];
+
+    if (pipe(fds) == -1) // pipe erstellen
     {
-        perror("pipe");
-        exit(EXIT_FAILURE);
+        printf("pipe failed\n");
+        exit(1);
     }
 
-    pid_t rc1 = fork();
-    if (rc1 < 0) 
-    {
-        perror("fork");
-        exit(EXIT_FAILURE);
-    } 
-    else if (rc1 == 0) 
-    { // First child
-        close(pipefd[0]); // Close unused read end
-        dup2(pipefd[1], STDOUT_FILENO); // Redirect stdout to pipe write end
-        close(pipefd[1]); // Close original write end
-        execlp("ls", "ls", NULL); // Example command that writes to stdout
-        perror("execlp");
-        exit(EXIT_FAILURE);
+    int f = fork();
+
+    if (f < 0)
+    { // fork failed
+        fprintf(stderr, "fork failed\n");
+        exit(1);
     }
-
-    pid_t rc2 = fork();
-    if (rc2 < 0) 
-    {
-        perror("fork");
-        exit(EXIT_FAILURE);
-    } 
-    else if (rc2 == 0) 
-    { // Second child
-        close(pipefd[1]); // Close unused write end
-        dup2(pipefd[0], STDIN_FILENO); // Redirect stdin to pipe read end
-        close(pipefd[0]); // Close original read end
-        execlp("wc", "wc", "-l", NULL); // Example command that reads from stdin
-        perror("execlp");
-        exit(EXIT_FAILURE);
+    else if (f == 0)
+    {                                // childprocess
+        close(fds[0]);               // read end wird geschlossen, da nicht benötigt
+        dup2(fds[1], STDOUT_FILENO); // stdout wird auf den write-Ende des Pipes umgeleitet
+        close(fds[1]);
+        printf("Hallo (Child)");
+        exit(0);
     }
-
-    // Parent closes both ends of the pipe
-    close(pipefd[0]);
-    close(pipefd[1]);
-
-    // Wait for both children to finish
-    wait(NULL);
-    wait(NULL);
-
+    else
+    { // parentprocess
+        int f2 = fork();
+        if (f2 < 0)
+        { // fork failed
+            fprintf(stderr, "fork failed\n");
+            exit(1);
+        }
+        else if (f2 == 0)
+        {
+            // 2. child
+            close(fds[1]);                        // write end wird geschlossen, da nicht benötigt
+            read(fds[0], buffer, sizeof(buffer)); // liest vom read-Ende der pipe, wird in buffer gespeichert
+            close(fds[0]);
+            if (strcmp(buffer, "Hallo (Child)") == 0)
+            {
+                printf("%s\n", buffer);
+                printf("Hallo!\n");
+            }
+            else
+            {
+                printf("failed\n");
+            }
+            exit(0);
+        }
+        else
+        {
+            // parentprocess
+            close(fds[0]);
+            close(fds[1]);
+            wait(NULL); // um Zombieprozesse zu vermeiden
+            wait(NULL);
+        }
+    }
     return 0;
 }
