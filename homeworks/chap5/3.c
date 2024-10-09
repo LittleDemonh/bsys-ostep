@@ -16,8 +16,7 @@ int main()
     }
     else
     {             // parent goes down this path (main)
-        sleep(1); // statt wait(NULL); pausiert den Elternprozess für 1 Sekunde,
-                  // CPU wird nicht blockiert
+        sleep(1); 
         printf("goodbye (parent)\n");
     }
     return 0;

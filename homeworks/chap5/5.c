@@ -21,8 +21,7 @@ int main()
     { // parent goes down this path (main)
         int w = wait(NULL);
         printf("goodbye\n");
-        printf("wait(): %d\n", w); // wait() gibt die PID des Childprozesses zurück
-                                   // Parent wartet auf Childprozess
+        printf("wait(): %d\n", w); // Parent wartet auf Childprozess                            
     }
     return 0;
 }

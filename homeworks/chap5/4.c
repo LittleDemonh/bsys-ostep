@@ -21,7 +21,7 @@ int main()
     else if (rc == 0)
     {
         // sucht im path, erfordert nicht den vollständigen Pfad, Programmname reicht
-        if (execlp("ls", "ls", (char *)NULL) == -1) 
+        if (execlp("ls", "ls", (char *)NULL) == -1)
         {
             fprintf(stderr, "execlp failed\n");
             exit(1);
@@ -39,7 +39,7 @@ int main()
     else if (rc == 0)
     {
         // sucht nicht im path
-        if (execl("/bin/ls", "ls", (char *)NULL) == -1) 
+        if (execl("/bin/ls", "ls", (char *)NULL) == -1)
         {
             fprintf(stderr, "execl failed\n");
             exit(1);
@@ -57,7 +57,7 @@ int main()
     else if (rc == 0)
     {
         // sucht nicht im path, man kann Umgebungsvariablen setzen
-        if (execle("/bin/ls", "ls", (char *)NULL, envp) == -1)  
+        if (execle("/bin/ls", "ls", (char *)NULL, envp) == -1)
         {
             fprintf(stderr, "execle failed\n");
             exit(1);
@@ -120,6 +120,8 @@ int main()
 
     return 0;
 }
-// jedes exec braucht andere argumente
+// Flexibilität
+// execl, execlp, execle: Argumente werden als separate Parameter übergeben.
+// execv, execvp, execvpe: Argumente werden als Array übergeben.
 // manche suchen im path, andere brauchen den vollständigen pfad
 // manche können Umgebungsvariablen setzen
